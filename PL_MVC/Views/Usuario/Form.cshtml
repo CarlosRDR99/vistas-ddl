@@ -1,0 +1,346 @@
+﻿@model ML.Usuario
+@{
+    ViewBag.Title = "Form";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("Form", "Usuario", FormMethod.Post, new {enctype = "multipart/form-data" }))
+{
+    @Html.HiddenFor(model => Model.IdUsuario, "IdUsuario")
+    @Html.HiddenFor(model => Model.Direccion.IdDireccion, "IdDireccion")
+
+    <div class="row">
+
+        <div class="col-12">
+            <h2>Datos del Usuario</h2>
+        </div>
+
+        <div class="col-md-3">
+            @Html.LabelFor(model => model.Nombre, "Nombre")
+            @Html.TextBoxFor(model => model.Nombre, new { @class = "form-control", placeholder = "Nombre" })
+        </div>
+        <div class="col-md-3">
+            @Html.LabelFor(model => model.ApellidoPaterno, "Apellido Paterno")
+            @Html.TextBoxFor(model => model.ApellidoPaterno, new { @class = "form-control", placeholder = "Apellido Paterno" })
+        </div>
+
+        <div class="col-md-3">
+            @Html.LabelFor(model => model.ApellidoMaterno, "Apellido Materno")
+            @Html.TextBoxFor(model => model.ApellidoMaterno, new { @class = "form-control", placeholder = "Apellido Materno" })
+        </div>
+    </div>
+    <hr>
+
+    <div class="row">
+
+        <div class="form-group col-md-3">
+            @Html.Label("Sexo")
+            <div class="form-control">
+                @Html.LabelFor(model => model.Sexo, "Masculino")
+                @Html.RadioButtonFor(model => model.Sexo, "M", new { @class = "form-check-input" })
+                @Html.LabelFor(model => model.Sexo, "Femenino")
+                @Html.RadioButtonFor(model => model.Sexo, "F", new { @class = "form-check-input" })
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            @Html.LabelFor(model => model.FechaNacimiento, "Fecha de Nacimiento")
+            @Html.TextBoxFor(model => model.FechaNacimiento, new { @type = "date", @class = "form-control datepicker" })
+        </div>
+
+        <div class="col-md-3">
+            @Html.LabelFor(model => model.CURP, "CURP")
+            @Html.TextBoxFor(model => model.CURP, new { @class = "form-control", placeholder = "CURP" })
+        </div>
+
+        <div class="col-md-3">
+            @Html.LabelFor(model => model.Telefono, "Teléfono")
+            @Html.TextBoxFor(model => model.Telefono, new { @class = "form-control", placeholder = "Teléfono" })
+        </div>
+
+        <div class="col-md-3" style="margin: 5px">
+            @Html.LabelFor(model => model.Celular, "Celular")
+            @Html.TextBoxFor(model => model.Celular, new { @class = "form-control", placeholder = "Celular" })
+        </div>
+    </div>
+    <hr>
+
+    <div class="row">
+
+        <div class="col-md-12">
+            @Html.LabelFor(model => Model.Imagen, "Imagen")
+            @if (Model.Imagen == null)
+            {
+                <img id="img" width="100" height="100" style="padding:10px" src="https://cdn.vectorstock.com/i/500p/53/42/user-member-avatar-face-profile-icon-vector-22965342.jpg">
+            }
+            else
+            {
+                <img id="img" width="100" height="100" style="padding:10px" src="data:image/png;base64,@Model.Imagen">
+
+            }
+            <input name="file" type="file" class="form-control" id="imagen" onchange="validarImagen(), previsuailzarImagen(this)" />
+            @Html.HiddenFor(model => Model.Imagen)
+        </div>
+        <div class="col-md-3">
+            @Html.LabelFor(model => Model.UserName, "Username")
+            @Html.TextBoxFor(model => Model.UserName, new { @class = "form-control", placeholder = "Username123" })
+        </div>
+        <div class="col-md-3">
+            @Html.LabelFor(model => model.Email, "Email")
+            @Html.TextBoxFor(model => model.Email, new { @class = "form-control", placeholder = "Correo electrónico" })
+        </div>
+
+        <div class="col-md-3">
+            @Html.LabelFor(model => model.Password, "Contraseña")
+            @Html.TextBoxFor(model => model.Password, new { @class = "form-control", placeholder = "Contraseña", type = "password" })
+        </div>
+
+        <div class="col-md-2">
+            @Html.LabelFor(model => model.Rol.IdRol, "Rol")
+
+            @Html.DropDownListFor(model => model.Rol.IdRol,
+           new SelectList(Model.Rol.Roles, "IdRol", "RolNombre"), "Selecciona",
+           new { @class = "form-control" })
+        </div>
+    </div>
+    <hr>
+
+    <div class="form-row">
+        <div class="col-12">
+            <h2>Dirección</h2>
+        </div>
+    </div>
+
+    <div class="row">
+
+        <div class="col-4">
+            @Html.LabelFor(model => model.Direccion.Colonia.Municipio.Estado.IdEstado, "Estado")
+
+            @Html.DropDownListFor(model => model.Direccion.Colonia.Municipio.Estado.IdEstado,
+           new SelectList(Model.Direccion.Colonia.Municipio.Estado.Estados, "IdEstado", "Nombre"), "Selecciona",
+           new { @class = "form-control", onchange = "consultarMunicipiosByIdEstado();", @id = "ddlEstado" })
+        </div>
+
+        <div class="col-4">
+            @if (Model.Direccion.Colonia.Municipio.Municipios == null)
+            {
+                @Html.LabelFor(model => model.Direccion.Colonia.Municipio.IdMunicipio, "Municipio")
+
+                @Html.DropDownListFor(model => model.Direccion.Colonia.Municipio.IdMunicipio,
+               new SelectList(string.Empty, "IdMunicipio", "Nombre"), "Selecciona",
+               new { @class = "form-control", @id = "ddlMunicipio", onchange = "ConsultarColoniasByIdMunicipio();" })
+
+            }
+            else
+            {
+                @Html.LabelFor(model => model.Direccion.Colonia.Municipio.IdMunicipio, "Municipio")
+                @Html.DropDownListFor(model => model.Direccion.Colonia.Municipio.IdMunicipio,
+               new SelectList(Model.Direccion.Colonia.Municipio.Municipios, "IdMunicipio", "Nombre"), "Selecciona",
+               new { @class = "form-control", @id = "ddlMunicipio", onchange = "ConsultarColoniasByIdMunicipio();" })
+
+            }
+        </div>
+        @if (Model.Direccion.Colonia.Colonias == null)
+        {
+            <div class="col-4">
+                @Html.LabelFor(model => model.Direccion.Colonia.IdColonia, "Colonia")
+
+                @Html.DropDownListFor(model => model.Direccion.Colonia.IdColonia,
+               new SelectList(string.Empty, "IdColonia", "Nombre"), "Selecciona",
+               new { @class = "form-control", @id = "ddlColonia" })
+            </div>
+        }
+        else
+        {
+            <div class="col-4">
+                @Html.LabelFor(model => model.Direccion.Colonia.Colonias, "Colonia")
+
+                @Html.DropDownListFor(model => model.Direccion.Colonia.IdColonia,
+               new SelectList(Model.Direccion.Colonia.Colonias, "IdColonia", "Nombre"), "Selecciona",
+               new { @class = "form-control", @id = "ddlColonia" })
+            </div>
+
+        }
+
+        <div class="col-3">
+            @Html.LabelFor(model => model.Direccion.Colonia.CP, "CP")
+            @Html.TextBoxFor(model => model.Direccion.Colonia.CP, new
+       {
+           @class = "form-control",
+           placeholder = "Codigo Postal",
+           @id = "tbCP",
+           onchange = "ConsultarTodoByCP();"
+       })
+            @*<button type="button"
+                        class="btn btn-primary"
+                        onclick="ConsultarTodoByCP();"
+                        >
+                    <strong>buscar</strong>
+                </button>*@
+        </div>
+        <div class="col-3">
+            @Html.LabelFor(model => model.Direccion.Calle, "Calle")
+            @Html.TextBoxFor(model => model.Direccion.Calle, new
+            {
+           @class = "form-control",
+           placeholder = "Calle"
+            })
+        </div>
+        <div class="col-3">
+            @Html.LabelFor(model => model.Direccion.NumeroInterior, "Numero Interior")
+            @Html.TextBoxFor(model => model.Direccion.NumeroInterior, new
+            {
+           @class = "form-control",
+           placeholder = "Num Interior"
+            })
+        </div>
+        <div class="col-3">
+            @Html.LabelFor(model => model.Direccion.NumeroExterior, "Numero Exterior")
+            @Html.TextBoxFor(model => model.Direccion.NumeroExterior, new
+            {
+           @class = "form-control",
+           placeholder = "Num Exterior"
+            })
+        </div>
+    </div>
+    <br>
+
+    <div class="row">
+
+        <div class="col-1">
+            @if (Model.IdUsuario == 0)
+            {
+                <button type="submit"
+                        class="btn btn-success">
+                    <strong>Insertar</strong>
+                </button>
+            }
+            else
+            {
+                <button type="submit"
+                        class="btn btn-warning">
+                    <strong>Modificar</strong>
+                </button>
+            }
+        </div>
+
+        <div class="col-1">
+            <a href="@Url.Action("GetAll", "Usuario")"
+               class="btn btn-danger"
+               onclick="return confirm('Estas seguro de que quieres cancelar?');">
+                <span>
+                    <strong>Cancelar</strong>
+                </span>
+            </a>
+        </div>
+    </div>
+}
+
+<script type="text/javascript">
+        function consultarMunicipiosByIdEstado() {
+            $("#ddlMunicipio").empty();
+            $.ajax({
+                type: 'GET',
+                url: '@Url.Action("GetMunicipioByIdEstado","Usuario")',
+                dataType: 'json',
+                data: { 'IdEstado': $("#ddlEstado").val() },
+                success: function (municipios) {
+                    $("#ddlMunicipio").append('<option value="0">' +'Selecciona una opcion' +'</option>');
+                    $.each(municipios.Objects, function (i, municipios) {
+                        $("#ddlMunicipio").append('<option value="' +
+                            municipios.IdMunicipio + '">' +
+                            municipios.Nombre + '</option>');
+                    });
+            },
+            error: function(ex) {
+                alert('Failed: '+ex.ErrorMessaje);
+            }
+            });
+        }
+    function ConsultarColoniasByIdMunicipio() {
+        $("#ddlColonia").empty();
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("GetColoniaByIdMunicipio","Usuario")',
+            dataType: 'json',
+            data: { 'IdMunicipio': $("#ddlMunicipio").val() },
+            success: function (colonias) {
+                $("#ddlColonia").append('<option value="0">' + 'Selecciona una opcion' + '</option>');
+                $.each(colonias.Objects, function (i, colonias) {
+                    $("#ddlColonia").append('<option value="' +
+                        colonias.IdColonia + '">' +
+                        colonias.Nombre + '</option>');
+                });
+            },
+            error: function(ex) {
+                alert('Failed: ' + ex.ErrorMessaje);
+            }
+        });
+    }
+
+    function ConsultarTodoByCP() {
+        $("#ddlColonia").empty();
+        $("#ddlMunicipio").empty();
+        $("#ddlEstado").empty();
+        var cpLength = $("#tbCP").val().length;
+        if (cpLength) {
+                $.ajax({
+        type: 'GET',
+        url: '@Url.Action("GetAllByCP", "Usuario")',
+        dataType: 'json',
+        data: { 'CP': $("#tbCP").val() },
+        success: function (result) {
+            //llenado de ddl
+            var contador = 0;
+            $("#ddlColonia").append('<option value="0">' + 'Selecciona una opcion' + '</option>');
+            $.each(result.Objects, function (i, colonia) {
+                $("#ddlColonia").append('<option value="' +
+                    colonia.IdColonia + '">' +
+                    colonia.Nombre + '</option>');
+                if (contador < 1) {
+                    $("#ddlMunicipio").append('<option value="' +
+                        colonia.Municipio.IdMunicipio + '">' +
+                        colonia.Municipio.Nombre + '</option>');
+                    $("#ddlEstado").append('<option value="' +
+                        colonia.Municipio.Estado.IdEstado + '">' +
+                        colonia.Municipio.Estado.Nombre + '</option>');
+                }
+                contador++;
+            });
+        },
+        error: function (ex) {
+            alert('Failed: ' + ex.ErrorMessage);
+        }
+        });
+        }
+    }
+
+        function validarImagen() {
+            var allowedExtension = ['jpeg', 'jpg', 'png'];
+            var fileExtension = document.getElementById('imagen').value.split('.').pop().toLowerCase();
+            var isValidFile = false;
+            for (var index in allowedExtension) {
+                if (fileExtension === allowedExtension[index]) {
+                    isValidFile = true;
+                    break;
+                }
+            }
+            if (!isValidFile) {
+                alert('Las extensiones permitidas son: *.' + allowedExtension.join(',*.'));
+                document.getElementById('imagen').value = "";
+            }
+            return isValidFile
+    }//mainf()
+
+        function previsuailzarImagen(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                $('#img').attr('src', e.target.result);
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+</script>

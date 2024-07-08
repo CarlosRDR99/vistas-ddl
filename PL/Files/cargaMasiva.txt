@@ -1,0 +1,16 @@
+Nombre|Descripcion|Precio|IdSucategoria
+Arroz integral|Semilla de Arroz integral|4|1
+Arroz Salvaje|Semilla de Arroz salvaje|7|1
+Menta|Semilla de Menta|11|2
+Tomillo|Semilla de Tomillo|6|2
+Pecañas|Semilla de Arroz pecañas|3|3
+Castañas|Semilla de castañas|9|3
+Fresas Secas|Semilla de Fresas secas|17|4
+Moras Secas|Semilla de Moras Secas|13|4
+Farro|Semilla de Farro|8|5
+Espelta |Semilla de Espelta|2|5
+Cañamo|Semilla de Cañamo|4|6
+Mostaza|Semilla de Mostaza|3|6
+Lupinos|Semilla de Lupinos|9|7
+Altramuces integral|Semilla de Altramuces|11|7
+Tirabeques|Semilla de Tirabeques|10|8

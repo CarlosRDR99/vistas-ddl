@@ -1,0 +1,264 @@
+﻿@model ML.Usuario
+@{
+    ViewBag.Title = "GetAll";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container ">
+    <div class="row">
+        <div class="col-12">
+            USUARIOS
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            Seleccione un usuario para editarlo o eliminarlo. Selecciona "+" para añadir uno nuevo
+        </div>
+    </div>
+    <hr />
+
+    <div class="row ">
+        <div class="col-3">
+            @Html.LabelFor(model => model.Nombre, "Nombre")
+            @Html.TextBoxFor(model => model.Nombre, new { @class = "form-control", @placeholder = "Nombre...", @id = "txtNombre" })
+        </div>
+        <div class="col-3">
+            @Html.LabelFor(model => model.ApellidoPaterno, "Apellido Paterno")
+            @Html.TextBoxFor(model => model.Nombre, new { @class = "form-control", @placeholder = "Apellido Paterno...", @id = "txtApPaterno" })
+        </div>
+        <div class="col-3">
+            @Html.LabelFor(model => model.ApellidoMaterno, "Apellido Materno")
+            @Html.TextBoxFor(model => model.Nombre, new { @class = "form-control", @placeholder = "Apellido Materno...", @id = "txtApMaterno" })
+        </div>
+        <div class="col-2">
+            @Html.LabelFor(model => model.Rol.IdRol, "Rol")
+
+            @Html.DropDownListFor(model => model.Rol.IdRol,
+           new SelectList(Model.Rol.Roles, "IdRol", "RolNombre"), "Selecciona",
+           new { @class = "form-control", @id = "ddlRol" })
+        </div>
+        <div class="col-1">
+            @Html.Label("Filtrar")
+            <button id="btnBuscar" class="btn btn-primary form-control" onclick="BusquedaAbierta();">
+                <i class="bi bi-search"></i>
+            </button>
+        </div>
+    </div>
+    <hr />
+
+    <!-- Boton de mas -->
+    <div class="row">
+        <div class="col-2 offset-11">
+            <a href="@Url.Action("Form", "Usuario", new {IdUsuario=0})" class="btn btn-success">
+                <i class="bi bi-plus-square"></i>
+
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            @if (Model.Usuarios == null)
+            {
+                <h1>NO HAY REGISTROS AUN</h1>
+            }
+            else
+            {
+                <div class="col-12" style="overflow-x: auto;">
+                    <table class="table table-dark table-hover" id="tbUsuarios">
+                        <thead>
+                            <tr>
+                                <th>Modificar</th>
+                                <th>UserName</th>
+                                <th>Nombre</th>
+                                <th>Apellido Paterno</th>
+                                <th>Apellido Materno</th>
+                                <th>Sexo</th>
+                                <th>Fecha de Nacimiento</th>
+                                <th>Email</th>
+                                <th>Password</th>
+                                <th>Rol</th>
+                                <th>Telefono</th>
+                                <th>Celular</th>
+                                <th>CURP</th>
+                                <th>Status</th>
+                                <td>Calle</td>
+                                <td>NumInt</td>
+                                <td>NumExt</td>
+                                <td>CP</td>
+                                <td>Colonia</td>
+                                <td>Municipio</td>
+                                <td>Estado</td>
+                                <th>Eliminar</th>
+                            </tr>
+                        </thead>
+                        @foreach (ML.Usuario usuario in Model.Usuarios)
+                        {
+                            <tr>
+                                <td>
+                                    <a href="@Url.Action("Form", "Usuario",
+                                        new {IdUsuario=usuario.IdUsuario})"
+                                       class="btn btn-warning">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+                                </td>
+                                <td>@usuario.UserName</td>
+                                <td>@usuario.Nombre</td>
+                                <td>@usuario.ApellidoPaterno</td>
+                                <td>@usuario.ApellidoMaterno</td>
+                                <td>@usuario.Sexo</td>
+                                <td>@usuario.FechaNacimiento</td>
+                                <td>@usuario.Email</td>
+                                <td>@usuario.Password</td>
+                                <td>@usuario.Rol.RolNombre</td>
+                                <td>@usuario.Telefono</td>
+                                <td>@usuario.Celular</td>
+                                <td>@usuario.CURP</td>
+                                @if (usuario.Status)
+                                {
+                                    <td style="text-align: center; vertical-align: middle;">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="chkStatus" checked onchange="ChangeStatus(@usuario.IdUsuario, this)">
+                                        </div>
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td style="text-align: center; vertical-align: middle;">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="chkStatus" onchange="ChangeStatus(@usuario.IdUsuario, this)">
+                                        </div>
+                                    </td>
+                                }
+                                <td>@usuario.Direccion.Calle</td>
+                                <td>@usuario.Direccion.NumeroInterior</td>
+                                <td>@usuario.Direccion.NumeroExterior</td>
+                                <td>@usuario.Direccion.Colonia.CP</td>
+                                <td>@usuario.Direccion.Colonia.Nombre</td>
+                                <td>@usuario.Direccion.Colonia.Municipio.Nombre</td>
+                                <td>@usuario.Direccion.Colonia.Municipio.Estado.Nombre</td>
+
+                                <td>
+                                    <a href="@Url.Action("Delete", "Usuario",
+                                        new {IdUsuario=usuario.IdUsuario, IdDireccion=usuario.Direccion.IdDireccion})"
+                                       onclick="return confirm('Estas seguro de eliminar este usuario?');"
+                                       class="btn btn-danger">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    function ChangeStatus(IdUsuario,e) {
+        var status = e.checked;
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("ChangeStatus", "Usuario")',
+            dataType: 'json',
+            data: { 'IdUsuario': IdUsuario, 'Status': status },
+            success: function(result){
+                if (result.Correct) {
+                    alert('Cambio de estatus exitoso');
+                }
+                else {
+                    alert('No se pudo cambiar el estatus');
+                }
+            },
+            error: function (e) {
+                alert('Exp: '+e.ErrorMessage);
+        },
+        });
+    }
+
+    function BusquedaAbierta() {
+        var NombreValue = $('#txtNombre').val();
+        var ApPaternoValue = $('#txtApPaterno').val();
+        var ApMaternoValue = $('#txtApMaterno').val();
+        var IdRolValue = parseInt($('#ddlRol').val());
+
+        var data = {
+            Nombre: NombreValue,
+            ApellidoPaterno: ApPaternoValue,
+            ApellidoMaterno: ApMaternoValue,
+            Rol:
+            {
+                IdRol: IdRolValue
+                }
+        }
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("BusquedaAbierta", "Usuario")',
+            dataType: 'json',
+            contentType: 'application/json',
+            data: JSON.stringify(data), //body
+            success: function (result) {
+                if (result.Correct) {
+                    $('#tbUsuarios tbody').empty();
+                    $.each(result.Objects, function (i, usuario) {
+                        var fila = $('<tr>');
+
+                        //forma 1 para el url
+                        var urlModificar = '/Usuario/Form?IdUsuario='+usuario.IdUsuario;
+                        //forma 2 para el url.action
+                        var urlEliminar = '@Url.Action("Delete", "Usuario", new { IdUsuario = "IdReemplazar", IdDireccion="IDireccion" })';
+                        urlEliminar = urlEliminar.replace("IdReemplazar", usuario.IdUsuario);
+                        urlEliminar = urlEliminar.replace("IDireccion", usuario.Direccion.IdDireccion);
+                        fila.append('<td><a href="' + urlModificar + '" class="btn btn-warning"><i class="bi bi-pencil-square"></i></a></td>');
+
+                        fila.append('<td>' + usuario.UserName + '</td>');
+                        fila.append('<td>' + usuario.Nombre + '</td>');
+                        fila.append('<td>' + usuario.ApellidoPaterno + '</td>');
+                        fila.append('<td>' + usuario.ApellidoMaterno + '</td>');
+                        fila.append('<td>' + usuario.Sexo + '</td>');
+                        fila.append('<td>' + usuario.FechaNacimiento + '</td>');
+                        fila.append('<td>' + usuario.Email + '</td>');
+                        fila.append('<td>' + usuario.Password + '</td>');
+                        fila.append('<td>' + usuario.Rol.RolNombre + '</td>');
+                        fila.append('<td>' + usuario.Telefono + '</td>');
+                        fila.append('<td>' + usuario.Celular + '</td>');
+                        fila.append('<td>' + usuario.CURP + '</td>');
+                        if (usuario.Status) {
+                                fila.append('<td style="text-align: center; vertical-align: middle;">' +
+                                    ' <div class="form-check form-switch">' +
+                                    ' <input class="form-check-input" type="checkbox" id="chkStatus" checked onchange="ChangeStatus(' + usuario.IdUsuario + ', this)">' +
+                                    '</div>' + '</td>');
+
+                        }
+                        else {
+                            fila.append('<td style="text-align: center; vertical-align: middle;">' +
+                                ' <div class="form-check form-switch">' +
+                                ' <input class="form-check-input" type="checkbox" id="chkStatus" onchange="ChangeStatus(' + usuario.IdUsuario + ', this)">' +
+                                '</div>' + '</td>');
+                        }
+                        fila.append('<td>' + usuario.Direccion.Calle + '</td>');
+                        fila.append('<td>' + usuario.Direccion.NumeroInterior + '</td>');
+                        fila.append('<td>' + usuario.Direccion.NumeroExterior + '</td>');
+                        fila.append('<td>' + usuario.Direccion.Colonia.CP + '</td>');
+                        fila.append('<td>' + usuario.Direccion.Colonia.Nombre + '</td>');
+                        fila.append('<td>' + usuario.Direccion.Colonia.Municipio.Nombre + '</td>');
+                        fila.append('<td>' + usuario.Direccion.Colonia.Municipio.Estado.Nombre + '</td>');
+
+                        fila.append('<td><a href="' + urlEliminar + '" onclick="return confirm(\'Estás seguro de eliminar este usuario ?\');" class="btn btn-danger"><i class="bi bi-trash"></i></a></td>');
+
+                        $('#tbUsuarios tbody').append(fila);
+                    });
+                }
+                else {
+                    alert('La busqueda no coincidio con algun usuario');
+                }
+            },
+            error: function (e) {
+                alert('Excep: ' + e.ErrorMessage);
+            },
+        });
+    }//aqui acaba busqueda abierta
+
+</script>
+

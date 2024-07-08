@@ -1,0 +1,130 @@
+﻿@model ML.ProductoSucursal
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<body>
+
+    <div class="container">
+        @using (Html.BeginForm("Index", "ProductoSucursal", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            <div class="row">
+                <div class="col-3" style="align-self:center">
+                    @Html.DropDownListFor(model => model.Sucursal.Id, new SelectList(Model.Sucursal.Sucursales, "Id", "Nombre"), "Selecciona", new { @class = "form-control", onchange = "", @id = "ddlSucursal" })
+                </div>
+                <div class="col-1" style="align-self:center">
+                    @*<a href="@Url.Action("Index", "ProductoSucursal", new { Id = Model.Sucursal.Id })" class="btn btn-primary">Buscar</a>*@
+                    <button type="submit"
+                            class="btn btn-primary">
+                        <strong>Buscar</strong>
+                    </button>
+                </div>
+            </div>
+        }
+        @if (Model.Sucursal.Id > 0)
+        {
+            <table class="table table-dark table-hover">
+                <thead>
+                    <tr>
+                        <th>Imagen</th>
+                        <th>Nombre</th>
+                        <th>Precio</th>
+                        <th>Stock</th>
+                        <th>Editar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (ML.ProductoSucursal productoSucursal in Model.ProductoSucursales)
+                    {
+                        <tr>
+                            @if (productoSucursal.Producto.Imagen == null)
+                            {
+                                <td><img src="https://estadonatural.com.mx/cdn/shop/products/semillas-de-fenogreco-estado-natural-605016.png?v=1698479256&width=640" style="width:60px;height:60px" alt="Imagen"></td>
+                            }
+                            else
+                            {
+                                <td><img src="data:image/jpg;base64,@productoSucursal.Producto.Imagen" style="width:60px;height:60px" alt="Imagen"></td>
+                            }
+                            <td>@productoSucursal.Producto.Nombre</td>
+                            <td>@productoSucursal.Producto.Precio</td>
+                            <td>
+                                <span id="lbStock_@productoSucursal.Id"> @productoSucursal.Stock </span>
+                                <input id="edStock_@productoSucursal.Id" type="text" value="@productoSucursal.Stock" style="display: none;" />
+                            </td>
+                            <td>
+                                <button class="btn btn-warning" id="btnEditar_@productoSucursal.Id" onclick="HabilitarStock('@productoSucursal.Id')">
+                                    <i class="bi bi-pencil-square"></i>
+                                </button>
+                                <button class="btn btn-success" id="btnConfirmar_@productoSucursal.Id" style="display: none;" onclick="Confirmar('@productoSucursal.Id')">
+                                    <i class="bi bi-check"></i>
+                                </button>
+                                <button class="btn btn-danger" id="btnCancelar_@productoSucursal.Id" style="display: none;" onclick="Cancelar('@productoSucursal.Id')">
+                                    <i class="bi bi-x"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <div class="row">
+                <div class="alert alert-light col-4" role="alert">
+                    <strong>SELECCIONA UNA SUCURSAL PARA EMPEZAR.</strong>
+                </div>
+            </div>
+        }
+
+    </div>
+</body>
+<script type="text/javascript">
+    function HabilitarStock(Id) {
+        //$("#edStock").prop('disabled', false);
+        $("#lbStock_" + Id).hide();
+        $("#edStock_" + Id).show();
+        $("#btnEditar_" + Id).hide();
+        $("#btnConfirmar_" + Id).show();
+        $("#btnCancelar_" + Id).show(); 
+    }
+
+    function Cancelar(Id){
+        $("#btnEditar_" + Id).show();
+        $("#btnConfirmar_" + Id).hide();
+        $("#btnCancelar_" + Id).hide(); 
+        $("#lbStock_" + Id).show();
+        $("#edStock_" + Id).hide();
+    }
+
+    function Confirmar(Id) {
+$.ajax({
+    type: 'GET',
+    url: '@Url.Action("UpdateStock", "ProductoSucursal")',
+    dataType: 'json',
+    data: { 'Id': parseInt(Id), 'Stock': parseInt($('#edStock_'+Id).val()) },
+    success: function (result) {
+        //hacer el update
+        if (result.Correct) {
+            $("#lbStock_" + Id).text($('#edStock_' + Id).val());
+
+            $("#lbStock_" + Id).show();
+            $("#edStock_" + Id).hide();
+            $("#btnEditar_" + Id).show();
+            $("#btnConfirmar_" + Id).hide();
+            $("#btnCancelar_" + Id).hide(); 
+
+            alert('Stock actualizado correctamente.');
+        }
+        else {
+            alert('Hubo un error al actualizar el stock: ' + result.ErrorMessage);
+        }
+},
+error: function(ex) {
+    alert('Failed: '+ex.ErrorMessaje);
+}
+});
+    }
+
+
+</script>

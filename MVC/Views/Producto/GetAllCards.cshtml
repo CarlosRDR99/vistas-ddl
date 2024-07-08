@@ -1,0 +1,40 @@
+﻿@model ML.Producto
+@{
+    ViewBag.Title = "GetAllCards";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@if (Model.Productos == null)
+{
+    <h1>NO HAY PRODUCTOS AUN</h1>
+}
+else {
+
+<body style="color: white; background-color: gray; background-image: url('https://media.istockphoto.com/id/171309616/es/foto/fondo-verde-hierba.webp?b=1&s=170667a&w=0&k=20&c=wmN9FVvqzYcVswJHYO3EXta_khPkrGXxwwqAUIyL9bA=')">
+    <div class="row">
+        @foreach (ML.Producto producto in Model.Productos)
+        {
+
+            <div class="col-sm-4">
+                <div class="card mb-3 text-center text-white bg-dark">
+                    @if (producto.Imagen == null)
+                    {
+                        <img src="https://estadonatural.com.mx/cdn/shop/products/semillas-de-fenogreco-estado-natural-605016.png?v=1698479256&width=640" class="card-img-top" alt="Imagen">
+                    }
+                    else
+                    {
+                        <img src="data:image/jpg;base64,@producto.Imagen" class="card-img-top" alt="Imagen">
+                    }
+                    <div class="card-body">
+                        <h5 class="card-title">@producto.Nombre, $@producto.Precio MXN</h5>
+                        <p class="card-text">@producto.Descripcion</p>
+                        <a href="@Url.Action("Carrito","Pedido", new {Id=producto.Id})" class="btn btn-success">Añadir al Carrito <i class="bi bi-cart-plus "></i></a>
+                        
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</body>
+}
+

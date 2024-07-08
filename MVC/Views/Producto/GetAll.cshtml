@@ -1,0 +1,239 @@
+﻿@model ML.Producto
+@{
+    ViewBag.Title = "GetAll";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<body style="background-color:dimgrey; color: white;">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                PRODUCTOS
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                Seleccione un producto para editarlo o eliminarlo. Selecciona "+" para añadir uno nuevo
+            </div>
+        </div>
+        <hr />
+        <!-- Boton de mas -->
+        <div class="row">
+            <div class="col-4">
+                @using (Html.BeginForm("CargaMasiva", "CargaMasiva", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                {
+                    <input type="file" name="Excel" id="Excel" />
+                    <button type="submit" class="btn btn-success" id="btnExcel"><i class="bi bi-send"></i></button>
+                }
+            </div>
+            <div class="col-6">
+                <button class="btn btn-primary" onclick="HabilitarBusqueda()" id="btnHabilitarBusqueda">
+                    <i class="bi bi-search"></i>
+                </button>
+                    @Html.LabelFor(model => model.SubCategoria.Categoria.Id, "Categoria", new { @id = "lblCategoria", @style = "display:none" })
+                    @Html.DropDownListFor(model => model.SubCategoria.Categoria.Id,
+        new SelectList(Model.SubCategoria.Categoria.Categorias, "Id", "Nombre"),
+        "Selecciona",
+        new { @class = "form-control", onchange = "ConsultarSubCategorias();", @id = "ddlCategoria", @style = "display:none" }
+    )
+                    @if (Model.SubCategoria.SubCategorias == null)
+                    {
+                        @Html.LabelFor(model => model.SubCategoria.Id, "SubCategorias", new { @id = "lblSubCategoria", @style = "display:none" })
+
+                        @Html.DropDownListFor(model => model.SubCategoria.Id,
+                       new SelectList(string.Empty, "Id", "Nombre"), "Selecciona una Categoria",
+                       new { @class = "form-control", @id = "ddlSubCategoria", @style = "display:none" })
+
+                    }
+                    else
+                    {
+                        @Html.LabelFor(model => model.SubCategoria.Id, "SubCategorias", new { @id = "lblSubCategoria", @style = "display:none" })
+                        @Html.DropDownListFor(model => model.SubCategoria.Id,
+                       new SelectList(Model.SubCategoria.SubCategorias, "Id", "Nombre"), "Selecciona una Categoria",
+                       new { @class = "form-control", @id = "ddlSubCategoria", @style = "display:none" })
+
+                    }
+                <button class="btn btn-primary" onclick="Busqueda()" id="btnBusqueda" style="display: none;">
+                    Buscar
+                </button>
+                <button class="btn btn-danger" onclick="Cancelar()" id="btnCancelar" style="display: none;">
+                    Cancelar
+                </button>
+            </div>
+
+            <div class="col-1 offset-11" style="margin: 2px">
+                <a href="@Url.Action("Form", "Producto", new {Id=0})" class="btn btn-success">
+                    Agregar
+                </a>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                @if (Model.Productos == null)
+                {
+                    <h1>NO HAY PRODUCTOS AUN</h1>
+                }
+                else
+                {
+                    <div class="col-12" style="overflow-x: auto;">
+                        <table class="table table-dark table-hover" id="tbProductos">
+                            <thead>
+                                <tr>
+                                    <th>Modificar</th>
+                                    <th>Imagen</th>
+                                    <th>Nombre</th>
+                                    <th>Descripcion</th>
+                                    <th>Precio</th>
+                                    <th>SubCategoria</th>
+                                    <th>Categoria</th>
+                                    <th>Eliminar</th>
+                                </tr>
+                            </thead>
+                            @foreach (ML.Producto producto in Model.Productos)
+                            {
+                                <tr>
+                                    <td>
+                                        <a href="@Url.Action("Form", "Producto",
+                                        new {Id=producto.Id})"
+                                           class="btn btn-warning">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
+                                    </td>
+                                    @if (producto.Imagen == null)
+                                    {
+                                        <td><img src="https://estadonatural.com.mx/cdn/shop/products/semillas-de-fenogreco-estado-natural-605016.png?v=1698479256&width=640" style="width:60px;height:60px" alt="Imagen"></td>
+                                    }
+                                    else
+                                    {
+                                        <td><img src="data:image/jpg;base64,@producto.Imagen" style="width:60px;height:60px" alt="Imagen"></td>
+                                    }
+                                    <td>@producto.Nombre</td>
+                                    <td>@producto.Descripcion</td>
+                                    <td>@producto.Precio</td>
+                                    <td>@producto.SubCategoria.Nombre</td>
+                                    <td>@producto.SubCategoria.Categoria.Nombre</td>
+                                    <td>
+                                        <a href="@Url.Action("Delete", "Producto",
+                                        new {Id=producto.Id})"
+                                           onclick="return confirm('Estas seguro de eliminar este producto?');"
+                                           class="btn btn-danger">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</body>
+<script type="text/javascript">
+    function HabilitarBusqueda() {
+        $("#btnHabilitarBusqueda").hide();
+        $("#ddlCategoria").show();
+        $("#ddlSubCategoria").show();
+        $("#btnBusqueda").show();
+        $("#btnCancelar").show();
+        $("#lblCategoria").show();
+        $("#lblSubCategoria").show();
+    }
+
+    function Cancelar() {
+        $("#btnHabilitarBusqueda").show();
+        $("#ddlCategoria").hide();
+        $("#ddlSubCategoria").hide();
+        $("#btnBusqueda").hide();
+        $("#btnCancelar").hide();
+        $("#lblCategoria").hide();
+        $("#lblSubCategoria").hide();
+        $("#ddlCategoria option:first").prop('selected', true);
+        $("#ddlSubCategoria option:first").prop('selected', true);
+
+    }
+
+     function ConsultarSubCategorias() {
+         $("#ddlSubCategoria").empty();
+         $.ajax({
+             type: 'GET',
+             url: '@Url.Action("GetSubCategoriasByIdCategoria", "Producto")',
+             dataType: 'json',
+             data: { 'Id': $("#ddlCategoria").val() },
+             success: function (SubCategorias) {
+                 $("#ddlSubCategoria").append('<option value="0">' +'Selecciona una opcion' +'</option>');
+                 $.each(SubCategorias.Objects, function (i, SubCategorias) {
+                     $("#ddlSubCategoria").append('<option value="' +
+                         SubCategorias.Id + '">' +
+                         SubCategorias.Nombre + '</option>');
+                 });
+         },
+         error: function(ex) {
+             alert('Failed: '+ex.ErrorMessaje);
+             }
+         });
+     }
+
+    function Busqueda() {
+        var IdCategoria = parseInt($('#ddlCategoria').val());
+        var IdSubcategoria = parseInt($('#ddlSubCategoria').val());
+        var data = {
+            SubCategoria:
+            {
+                Id: IdSubcategoria,
+                Categoria: {
+                    Id: IdCategoria
+                }
+                }
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("Busqueda", "Producto")',
+            dataType: 'json',
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: function (result) {
+                if (result.Correct) {
+                    $('#tbProductos tbody').empty();
+                    $.each(result.Objects, function (i, producto) {
+                        var fila = $('<tr>');
+
+                        //forma 1 para el url
+                        var urlModificar = '/Producto/Form?Id='+producto.Id;
+                        //forma 2 para el url.action
+                        var urlEliminar = '@Url.Action("Delete", "Producto", new { Id = "IdReemplazar"})';
+                        urlEliminar = urlEliminar.replace("IdReemplazar", producto.Id);
+
+                        fila.append('<td><a href="' + urlModificar + '" class="btn btn-warning"><i class="bi bi-pencil-square"></i></a></td>');
+
+                        if (producto.Imagen == null || producto.Imagen == "") {
+                            fila.append('<td><img src="https://estadonatural.com.mx/cdn/shop/products/semillas-de-fenogreco-estado-natural-605016.png?v=1698479256&width=640" style="width:60px;height:60px" alt="Imagen"></td>');
+                        } else {
+                            fila.append('<td><img src="data:image/jpg;base64,' + producto.Imagen + '" style="width:60px;height:60px" alt="Imagen"></td>');
+                        }
+                        fila.append('<td>' + producto.Nombre + '</td>');
+                        fila.append('<td>' + producto.Descripcion + '</td>');
+                        fila.append('<td>' + producto.Precio + '</td>');
+                        fila.append('<td>' + producto.SubCategoria.Nombre + '</td>');
+                        fila.append('<td>' + producto.SubCategoria.Categoria.Nombre + '</td>');
+                        fila.append('<td><a href="' + urlEliminar + '" onclick="return confirm(\'Estás seguro de eliminar este producto ?\');" class="btn btn-danger"><i class="bi bi-trash"></i></a></td>');
+
+                        $('#tbProductos tbody').append(fila);
+                    });
+                }
+                else {
+                    alert('La busqueda no coincidio con algun producto');
+                }
+            },
+            error: function (e) {
+                alert('Excep: ' + e.ErrorMessage);
+            },
+        });
+        $("#ddlCategoria option:first").prop('selected', true);
+        $("#ddlSubCategoria option:first").prop('selected', true);
+    }
+
+</script>
+

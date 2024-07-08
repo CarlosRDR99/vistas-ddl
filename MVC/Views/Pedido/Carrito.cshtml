@@ -1,0 +1,67 @@
+﻿@model ML.DetallePedido
+@{
+    ViewBag.Title = "Carrito";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<html>
+<head>
+    <style>
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+        }
+
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+    </style>
+</head>
+<body>
+    @if (Model.DetallePedidos==null)
+    {
+        <h1>AUN NO TIENES PRODUCTOS EN EL CARRITO</h1>
+    }
+    else
+    {
+        <div class="container">
+            @using (Html.BeginForm("Carrito", "Producto", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            {
+                <a href="@Url.Action("GetAllCards", "Producto")" class="btn btn-warning">REGRESAR</a>
+                foreach (ML.DetallePedido detallePedido in Model.DetallePedidos)
+                {
+                    <div class="row justify-content-center">
+                        @if (detallePedido.Producto.Imagen == null)
+                        {<div class="col-1 align-content-center">
+                                <img src="https://estadonatural.com.mx/cdn/shop/products/semillas-de-fenogreco-estado-natural-605016.png?v=1698479256&width=640" style="width:60px;height:60px" alt="Imagen" id="img_@detallePedido.Producto.Id">
+                            </div>
+                        }
+                        else
+                        {<div class="col-1 align-content-center">
+                                <img src="data:image/jpg;base64,@detallePedido.Producto.Imagen" style="max-width:60px;max-height:60px" class="img-fluid" alt="Imagen" id="img_@detallePedido.Producto.Id">
+                            </div>
+                        }
+                        <div class="col-1 align-content-center">
+                            @Html.Label(detallePedido.Producto.Nombre, new { @id = "lblNombre_" + detallePedido.Producto.Id })
+                            </div>
+                            <div class="col-1 align-content-center">
+                                <a href="@Url.Action("Carrito", "Pedido", new {Id=detallePedido.Producto.Id,Op=1})" class="btn btn-secondary" id="btnMenos_@detallePedido.Producto.Id"><i class="bi bi-dash-circle"></i></a>
+                            </div>
+                            <div class="col-1 align-content-center">
+                                <input type="number" id="inNumber_@detallePedido.Producto.Id" class="form-control text-center" value="@detallePedido.Cantidad">
+                            </div>
+                            <div class="col-1 align-content-center">
+                                <a href="@Url.Action("Carrito", "Pedido", new {Id=detallePedido.Producto.Id,Op=2})" class="btn btn-primary text-center" id="btnMas_@detallePedido.Producto.Id"><i class="bi bi-plus-circle"></i></a>
+                            </div>
+                            <div class="col-1 align-content-center">
+                                <a href="@Url.Action("Carrito", "Pedido", new {Id=detallePedido.Producto.Id,Op=3})" class="btn btn-danger" id="btnMas_@detallePedido.Producto.Id"><i class="bi bi-trash"></i></a>
+                            </div>
+                        </div>
+                        }
+                        }
+                    </div>
+    }
+</body>
+</html>
+<script type="text/javascript">
+
+</script>
